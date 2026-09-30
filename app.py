@@ -4,10 +4,9 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    name="rohit"
-    course="B.tech"
-    city = "delhi"
-    return render_template("index.html",name=name,course=course,city=city)
+    is_logged_in = False
+    marks = 0
+    return render_template("index.html",is_logged_in=is_logged_in,marks=marks)
 
 
 if __name__=="__main__":

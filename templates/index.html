@@ -6,7 +6,23 @@
     <title>Hello world page</title>
 </head>
 <body>
-    <h1> hello {{name}} </h1>
-    <p> enroll in {{course}} from city {{city}}</p>
+    <h1> hello  </h1>
+    {% if is_logged_in %}
+    <h1> Welcome Back </h1>
+    {% else %}
+    <h2> log in first</h2>
+    {% endif %}
+
+    
+
+    {% if marks >=90 %}
+    <h3> Grade A</h3>
+    {% elif marks >=75 %}
+    <h3> Grade B </h3>
+    {% elif marks >=50 %}
+    <h3> Grade c </h3>
+    {% else %}
+    <h3> Fail </h3> 
+    {% endif %}
 </body>
 </html>
