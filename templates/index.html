@@ -1,27 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello world page</title>
-</head>
-<body>
-    <h1> Given Courses : </h1>
-    <ul>
-    {% for course in courses  %}
-    <li>{{loop.index}} {{ course }}</li>
-    {% if course == "Flask" %}
-       <p> this course is currently ongoing named : {{course}} </p>
-    {% endif %}
-    {% endfor %}
-    </ul>
-    <hr>
+{% extends "base.html" %}
 
-    <ul>
-    <h1> Student Details : </h1>
-    {% for key,value in student.items()  %}
-    <li>{{key}} : {{value}}</li>
-    {% endfor %}
-    </ul>
-</body>
-</html>
+{% block content %}
+    <h1>Welcome to the Home Page</h1>
+    <p>This is the home page content.</p>
+{% endblock %}
