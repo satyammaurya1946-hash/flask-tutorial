@@ -6,23 +6,22 @@
     <title>Hello world page</title>
 </head>
 <body>
-    <h1> hello  </h1>
-    {% if is_logged_in %}
-    <h1> Welcome Back </h1>
-    {% else %}
-    <h2> log in first</h2>
+    <h1> Given Courses : </h1>
+    <ul>
+    {% for course in courses  %}
+    <li>{{loop.index}} {{ course }}</li>
+    {% if course == "Flask" %}
+       <p> this course is currently ongoing named : {{course}} </p>
     {% endif %}
+    {% endfor %}
+    </ul>
+    <hr>
 
-    
-
-    {% if marks >=90 %}
-    <h3> Grade A</h3>
-    {% elif marks >=75 %}
-    <h3> Grade B </h3>
-    {% elif marks >=50 %}
-    <h3> Grade c </h3>
-    {% else %}
-    <h3> Fail </h3> 
-    {% endif %}
+    <ul>
+    <h1> Student Details : </h1>
+    {% for key,value in student.items()  %}
+    <li>{{key}} : {{value}}</li>
+    {% endfor %}
+    </ul>
 </body>
 </html>
