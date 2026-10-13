@@ -6,18 +6,20 @@
     <form action="/contact" method='POST'> 
         <div> 
             <label>Name:</label>
-            <input type="text" id="name" name="username" placeholder="Enter your name">
+            <input type="text" id="name" name="name" placeholder="Enter your name">
         </div>
         <div>
             <label >Email:</label>
             <input type="email" id="email" name="email" placeholder="Enter your email">
         </div>
         <div>
-            <label >Message:</label>
-            <textarea id="message" name="message" placeholder="Enter your message"></textarea>
+            <label >Age:</label>
+            <input type="number" id="age" name="age" placeholder="Enter your age">
         </div>
-        <button type="submit">Submit</button>
+        <button type="submit">Register</button>
     </form>
 
     <div> {{name}} </div>
+    <div> {{email}} </div>
+    <div> {{age}} </div>
 {% endblock %}
