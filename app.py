@@ -21,17 +21,20 @@ def contact():
         age = request.form.get("age","").strip()
         # Process the form data (e.g., save to database,send email)
         if not name:
-            return "Name is required"
+            flash("Name is required!","danger")
+            return redirect(url_for("contact"))
         if not email:
-            return "Email is required"
+            flash("email is required!","danger")
+            return redirect(url_for("contact"))
         if not age:
-            return "Age is required"
+            flash("age is required!","danger")
+            return redirect(url_for("contact"))
         if not age.isdigit():
             return "Age must be a number"
         # age = int(age)
         # return redirect("/success")
         # return redirect(url_for("success"))
-        flash("Form submitted successfully!")
+        flash("Form submitted successfully!","success")
         
         # return render_template("contact.html", name=name, email=email, age=age)
     
