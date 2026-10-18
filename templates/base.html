@@ -18,6 +18,15 @@
     {% block content %}
     
     {% endblock %}
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div>
+                {{message}}
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
     {% include "components/footer.html" %}
     <script src="{{ url_for('static', filename='js/script.js') }}"></script> 
     {# for the use of tailwindcss, we can use the following script that is givin below #}
