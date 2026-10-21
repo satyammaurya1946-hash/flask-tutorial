@@ -1,9 +1,35 @@
-from flask import Flask , render_template , request , redirect , url_for , flash , session
+from flask import Flask , render_template , request , redirect , url_for , flash , session 
+import os
 
 app = Flask(__name__)
 
 
 app.secret_key = "your_secret_key"  # Replace with a secure secret key for session management. secret_key is used to sign the session cookies to protect against cookie data tampering. It should be a random string and kept secret.it is used to encrypt the session data and ensure that it cannot be tampered with by the client. It is important to set a strong secret key to maintain the security of the application.it should be on environment variable or a config file and not hardcoded in the code for security reasons.
+
+UPLOAD_FOLDER = "uploads"  # Define the folder where uploaded files will be stored. This variable specifies the directory where uploaded files will be saved. It is used in the upload route to determine the destination path for saving the uploaded files. Make sure this folder exists and has appropriate write permissions.
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)  # Create the uploads folder if it doesn't exist. The os.makedirs function is used to create the specified directory (and any necessary parent directories) if it doesn't already exist. The exist_ok=True parameter allows the function to succeed even if the directory already exists, preventing an error from being raised.
+
+@app.route("/upload", methods=["GET", "POST"])
+def upload():
+    if request.method == "POST":
+        file = request.files.get("file")  # Get the uploaded file from the request
+        if not file:
+            return "No file uploaded", 400  # Return a 400 Bad Request response if no file was uploaded
+        if file.filename == "":
+            return "No selected file", 400  # Return a 400 Bad Request response if the uploaded file has no filename
+        file.save(
+            os.path.join(UPLOAD_FOLDER, file.filename)  # Save the uploaded file to the 'uploads' directory. The os.path.join function is used to create a platform-independent file path. It ensures that the correct path separator is used based on the operating system (e.g., '/' for Unix-like systems and '\' for Windows). This helps avoid issues with file paths when running the application on different platforms.
+        )
+        
+        return "File uploaded successfully!"  # Return a success message after the file is saved
+    return render_template("upload.html")  # Render the upload form if the request method is not POST
+    
+    # Process the uploaded file (e.g., save to disk, upload to cloud storage)
+    # For demonstration purposes, we'll just save it to the 'uploads' directory
+    file.save(f"uploads/{file.filename}")
+    flash("File uploaded successfully!", "success")
+    return redirect(url_for("upload"))
+
 
 @app.errorhandler(404)
 def page_not_found(error):
