@@ -1,10 +1,16 @@
 from flask import Flask , render_template , request , redirect , url_for , flash , session 
 import os
+from dotenv import load_dotenv
+
+
+load_dotenv()  # Load environment variables from a .env file if present. This allows you to keep sensitive information like secret keys and configuration settings outside of your codebase, enhancing security and flexibility.
 
 app = Flask(__name__)
 
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")  # Set the secret key for session management. The secret key is used to sign session cookies and protect against cookie data tampering. It should be a random string and kept secret. It is important to set a strong secret key to maintain the security of the application. It should be stored in an environment variable or a configuration file, not hardcoded in the code, for security reasons.
 
-app.secret_key = "your_secret_key"  # Replace with a secure secret key for session management. secret_key is used to sign the session cookies to protect against cookie data tampering. It should be a random string and kept secret.it is used to encrypt the session data and ensure that it cannot be tampered with by the client. It is important to set a strong secret key to maintain the security of the application.it should be on environment variable or a config file and not hardcoded in the code for security reasons.
+
+app.secret_key = os.getenv("SECRET_KEY")  # Replace with a secure secret key for session management. secret_key is used to sign the session cookies to protect against cookie data tampering. It should be a random string and kept secret.it is used to encrypt the session data and ensure that it cannot be tampered with by the client. It is important to set a strong secret key to maintain the security of the application.it should be on environment variable or a config file and not hardcoded in the code for security reasons.
 
 UPLOAD_FOLDER = "uploads"  # Define the folder where uploaded files will be stored. This variable specifies the directory where uploaded files will be saved. It is used in the upload route to determine the destination path for saving the uploaded files. Make sure this folder exists and has appropriate write permissions.
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)  # Create the uploads folder if it doesn't exist. The os.makedirs function is used to create the specified directory (and any necessary parent directories) if it doesn't already exist. The exist_ok=True parameter allows the function to succeed even if the directory already exists, preventing an error from being raised.
@@ -64,7 +70,8 @@ def logout():
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    APP_NAME = os.getenv("APP_NAME", "My FlaskApp")  # Get the application name from environment variables, defaulting to "My FlaskApp" if not set. This allows for easy customization of the application name without modifying the code. It retrieves the value of the APP_NAME environment variable using os.getenv(). If the variable is not set, it defaults to "My FlaskApp". This can be useful for branding or identifying the application in different environments (e.g., development, staging, production).
+    return f"Welcome to {APP_NAME}! <a href='/about'>About</a> | <a href='/contact'>Contact</a> | <a href='/upload'>Upload</a> | <a href='/dashboard'>Dashboard</a>"
 
 @app.route("/about")
 def about():
