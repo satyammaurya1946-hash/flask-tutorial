@@ -53,6 +53,28 @@ def get_user(user_id):
     }
     return jsonify(user_data)
 
+
+
+@app.route("/update-user/<int:user_id>", methods=["PATCH"])
+def update_user(user_id):
+    data = request.get_json() # takes the data from the request body it means takes the data fromm the user(Browser) or external sources like postman or curl and save in the data variable
+    user = db.get_or_404(User, user_id)
+    if "name" in data:
+        user.username = data["name"]
+    if "email" in data:
+        user.email = data["email"]
+    if "age" in data:
+        user.age = data["age"]
+    db.session.commit()
+    return jsonify({"message": "User updated"})
+
+@app.route("/delete-user/<int:user_id>", methods=["DELETE"])
+def delete_user(user_id):
+    user = db.get_or_404(User, user_id) #in this code of line we fetch the user_id from the user and if the user_id is not found then it will return 404 error
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({"message": "User deleted"})
+
 @app.route("/")
 def home():
     return "flask + sql alchemy + sqlite is working"
