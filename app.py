@@ -1,85 +1,37 @@
-from flask import Flask , request , jsonify
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
+from dotenv import load_dotenv
+import os
+from urllib.parse import quote_plus
+
+load_dotenv()  # Load environment variables from .env file
 
 app = Flask(__name__)
+# Configure the database connection using environment variables
+DB_USERNAME = os.getenv('DB_USERNAME')
+DB_PASSWORD = quote_plus(os.getenv('DB_PASSWORD'))
+DB_HOST = os.getenv('DB_HOST')
+DB_PORT = os.getenv('DB_PORT')
+DB_NAME = os.getenv('DB_NAME')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///app.db"
+# DATABASE_URI = f'mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
+
+DATABASE_URI = f'mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 
 db = SQLAlchemy(app)
 
-class User(db.Model):
-    __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    age = db.Column(db.Integer, nullable=False)
-
-
-@app.route("/create-user", methods=["POST"])
-def create_user():
-    data = request.get_json()
-    name = data.get("name")
-    email = data.get("email")
-    age = data.get("age")
-    
-    user = User(username=name, email=email, age=age)
-    
-    db.session.add(user)
-    db.session.commit()
-    return jsonify({"message": "User created"})
-
-@app.route("/get-users", methods=["GET"])
-def get_users():
-    users = User.query.all()
-    user_list = []
-    for user in users:
-        user_data = {
-            "id": user.id,
-            "username": user.username,
-            "email": user.email,
-            "age": user.age
-        }
-        user_list.append(user_data)
-    return jsonify(user_list)
-
-@app.route("/get-user/<int:user_id>", methods=["GET"])
-def get_user(user_id):
-    user=db.get_or_404(User, user_id)
-    user_data = {
-        "id": user.id,
-        "username": user.username,
-        "email": user.email,
-        "age": user.age
-    }
-    return jsonify(user_data)
-
-
-
-@app.route("/update-user/<int:user_id>", methods=["PATCH"])
-def update_user(user_id):
-    data = request.get_json() # takes the data from the request body it means takes the data fromm the user(Browser) or external sources like postman or curl and save in the data variable
-    user = db.get_or_404(User, user_id)
-    if "name" in data:
-        user.username = data["name"]
-    if "email" in data:
-        user.email = data["email"]
-    if "age" in data:
-        user.age = data["age"]
-    db.session.commit()
-    return jsonify({"message": "User updated"})
-
-@app.route("/delete-user/<int:user_id>", methods=["DELETE"])
-def delete_user(user_id):
-    user = db.get_or_404(User, user_id) #in this code of line we fetch the user_id from the user and if the user_id is not found then it will return 404 error
-    db.session.delete(user)
-    db.session.commit()
-    return jsonify({"message": "User deleted"})
-
-@app.route("/")
+@app.route('/')
 def home():
-    return "flask + sql alchemy + sqlite is working"
+    return "Hello, Flask with MySQL!"
 
-if __name__=="__main__":
-    with app.app_context():
-        db.create_all()
+@app.route('/test_db')
+def test_db():
+    result = db.session.execute(text("SELECT 1"))
+    value = result.scalar() # this line reads the result of sql
+    return f"Database connection test successful! Result: {value}"
+
+if __name__ == '__main__':
     app.run(debug=True)
