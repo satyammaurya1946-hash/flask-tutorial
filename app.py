@@ -38,7 +38,8 @@ class Order(db.Model):
     product = db.Column(db.String(100), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-
+    # user_id -----> users.id
+    
 @app.route('/')
 def home():
     return "Hello, Flask with MySQL!"
@@ -84,6 +85,74 @@ def get_user_orders(user_id):
         })
     return jsonify({"user": user.name,
                     "orders": orders_data}), 200
+
+
+@app.route("/users/filter", methods=["GET"])
+def filter_users():
+    age = request.args.get("age", type=int)
+    if age is None:
+        return jsonify({"error": "Age parameter is required"}), 400
+    
+    users = User.query.filter(User.age >= age).all()
+    users_data = []
+    for user in users:
+        users_data.append({
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "age": user.age
+        })
+    return jsonify({"users": users_data}), 200
+
+# @app.route("/users/orders", methods=["GET"])
+# def user_orders():
+#     sql = text("""
+#         SELECT users.id AS user_id, users.name AS user_name, users.email AS user_email, users.age AS user_age,
+#                orders.id AS order_id, orders.product AS order_product, orders.amount AS order_amount
+#         FROM users
+#         LEFT JOIN orders ON users.id = orders.user_id
+#     """)
+#     result = db.session.execute(sql)
+#     data = []
+#     for row in result:
+#         data.append({
+#             "user_id": row.user_id,
+#             "user_name": row.user_name,
+#             "user_email": row.user_email,
+#             "user_age": row.user_age,
+#             "order_id": row.order_id,
+#             "order_product": row.order_product,
+#             "order_amount": row.order_amount
+#         })
+#     return jsonify(data), 200
+
+@app.route("/users/orders", methods=["GET"])
+def user_orders():
+    result = db.session.query(User.name,Order.product,Order.amount).join(Order, User.id == Order.user_id)
+    data = []
+    for name, product, amount in result:
+        data.append({
+            "user_name": name,
+            "product": product,
+            "amount": amount
+        })
+    return jsonify(data), 200
+
+@app.route("/users", methods=["GET"])
+def get_users():
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 2, type=int)
+    pagination = User.query.paginate(page=page, per_page=per_page, error_out=False)
+    users = pagination.items
+    users_data = []
+    for user in users:
+        users_data.append({
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "age": user.age
+        })
+    return jsonify({"users": users_data}), 200
 
 
 if __name__ == '__main__':
