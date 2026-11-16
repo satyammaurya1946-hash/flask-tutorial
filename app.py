@@ -62,6 +62,57 @@ def get_user(user_id):
         "email": user["email"],
         "age": user["age"]
     }), 200
+    
+@app.route("/users/<user_id>", methods=["PUT"])
+def update_user(user_id):
+    user_id = ObjectId(user_id)
+    data = request.get_json()
+    result = user_collection.update_one({"_id": user_id}, 
+                                        {"$set":{
+                                            "name": data["name"],
+                                            "email": data["email"],
+                                            "age": data["age"]}
+                                         })
+    if result.matched_count == 0:
+        return jsonify({"message": "User not found"}), 404
+    return jsonify({"message": "User updated successfully!"}), 200
+
+@app.route("/users/<user_id>", methods=["PATCH"])
+def update_user_patch(user_id):
+    user_id = ObjectId(user_id)
+    data = request.get_json()
+    
+    update_data = {}
+    if "name" in data:
+        update_data["name"] = data["name"]
+    if "email" in data:
+        update_data["email"] = data["email"]
+    if "age" in data:
+        update_data["age"] = data["age"]
+    if not update_data:
+        return jsonify({"message": "No valid fields to update"}), 400
+    
+    result = user_collection.update_one({"_id": user_id}, {"$set": update_data})
+    
+    if result.matched_count == 0:
+        return jsonify({"message": "User not found"}), 404
+    return jsonify({"message": "User updated successfully!"}), 200
+
+@app.route("/users/<user_id>", methods=["DELETE"])
+def delete_user(user_id):
+    user_id = ObjectId(user_id)
+    result = user_collection.delete_one({"_id": user_id})
+    if result.deleted_count == 0:
+        return jsonify({"message": "User not found"}), 404
+    return jsonify({"message": "User deleted successfully!"}), 200
+
+@app.route("/users/bulk", methods=["DELETE"])
+def delete_users_bulk():
+    data = request.get_json()
+    ids = [ObjectId(id) for id in data["ids"]]
+    result = user_collection.delete_many({"_id": {"$in": ids}})
+    return jsonify({"message": f"{result.deleted_count} users deleted successfully!"}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
+
